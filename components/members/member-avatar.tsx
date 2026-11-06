@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import Link from 'next/link'
+import Link from '@/components/site/link'
 import type { Member } from '@/lib/types'
 import { cn } from '@/lib/utils'
 

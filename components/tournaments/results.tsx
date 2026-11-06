@@ -1,5 +1,5 @@
 import type { Dictionary, Locale } from '@/lib/i18n/dictionaries'
-import { label } from '@/lib/i18n/format'
+import { pick } from '@/lib/i18n/format'
 import type { FortniteStanding, ValorantMatch } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
@@ -33,7 +33,7 @@ export function FortniteStandings({ standings, t }: { standings: FortniteStandin
   )
 }
 
-export function ValorantMatches({ matches, t, locale }: { matches: ValorantMatch[]; t: Dictionary; locale: Locale }) {
+export function ValorantMatches({ matches, t, locale, translation='none' }: { matches: ValorantMatch[]; t: Dictionary; locale: Locale; translation?:import('@/lib/types').TranslationStatus }) {
   return (
     <ul className="grid gap-4 md:grid-cols-2">
       {matches.map((m) => {
@@ -41,7 +41,7 @@ export function ValorantMatches({ matches, t, locale }: { matches: ValorantMatch
         const winsB = m.maps.filter((x) => x.scoreB > x.scoreA).length
         return (
           <li key={m.id} className="border">
-            <p className="border-b bg-muted px-4 py-2 text-xs font-bold">{label(m.round, locale)}</p>
+            <p className="border-b bg-muted px-4 py-2 text-xs font-bold">{pick(m.round,{translation},locale)}</p>
             <div className="divide-y">
               {(['A', 'B'] as const).map((side) => (
                 <div key={side} className={cn('flex items-center justify-between px-4 py-3', m.winner === side && 'font-bold')}>

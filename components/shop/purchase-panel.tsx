@@ -1,11 +1,11 @@
 'use client'
 
-import Link from 'next/link'
+import Link from '@/components/site/link'
 import { useMemo, useState } from 'react'
 import { Check, Minus, Plus } from 'lucide-react'
 import { useI18n } from '@/components/providers/i18n-provider'
 import { MAX_QTY_PER_LINE, useCart } from '@/components/providers/cart-provider'
-import { label } from '@/lib/i18n/format'
+import { pick } from '@/lib/i18n/format'
 import type { Availability, Product } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
@@ -53,10 +53,10 @@ export function PurchasePanel({ product, availability }: { product: Product; ava
       {product.options.map((o) => (
         <fieldset key={o.key}>
           <legend className="mb-2 text-sm font-bold">
-            {label(o.name, locale)}
+            {pick(o.name, product, locale)}
             {selected[o.key] && (
               <span className="ml-2 font-normal text-muted-foreground">
-                {label(o.values.find((v) => v.id === selected[o.key])!.label, locale)}
+                {pick(o.values.find((v) => v.id === selected[o.key])!.label, product, locale)}
               </span>
             )}
           </legend>
@@ -86,7 +86,7 @@ export function PurchasePanel({ product, availability }: { product: Product; ava
                     }}
                     className="sr-only"
                   />
-                  {label(v.label, locale)}
+                  {pick(v.label, product, locale)}
                   {soldOut && <span className="sr-only">（{t.shop.soldOut}）</span>}
                 </label>
               )

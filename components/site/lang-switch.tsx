@@ -1,20 +1,19 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
-import { useTransition } from 'react'
+import { useState } from 'react'
 import { useI18n } from '@/components/providers/i18n-provider'
 import { LOCALE_COOKIE, type Locale } from '@/lib/i18n/dictionaries'
 import { cn } from '@/lib/utils'
 
 export function LangSwitch({ className }: { className?: string }) {
   const { locale, t } = useI18n()
-  const router = useRouter()
-  const [pending, startTransition] = useTransition()
+  const [pending, setPending] = useState(false)
 
   function change(next: Locale) {
     if (next === locale) return
     document.cookie = `${LOCALE_COOKIE}=${next}; path=/; max-age=31536000; samesite=lax`
-    startTransition(() => router.refresh())
+    setPending(true)
+    window.location.reload()
   }
 
   return (

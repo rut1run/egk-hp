@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Link from '@/components/site/link'
 import { cn } from '@/lib/utils'
 
 export function EggMark({ className }: { className?: string }) {

@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Link from '@/components/site/link'
 import { Container } from '@/components/site/primitives'
 import { EggMark } from '@/components/site/logo'
 import { getI18n } from '@/lib/i18n/server'

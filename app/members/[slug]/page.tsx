@@ -1,6 +1,7 @@
+import { currentAccount,database } from '@/lib/auth/server'
 import type { Metadata } from 'next'
 import Image from 'next/image'
-import Link from 'next/link'
+import Link from '@/components/site/link'
 import { notFound } from 'next/navigation'
 import { ArrowLeft, ArrowUpRight, Heart } from 'lucide-react'
 import { MemberAvatar, MemberTile } from '@/components/members/member-avatar'
@@ -35,6 +36,7 @@ export default async function MemberPage({ params }: Props) {
   const division = divisions.find((d) => d.slug === member.divisionSlug)
   const others = all.filter((m) => m.divisionSlug === member.divisionSlug && m.slug !== member.slug)
   const bio = pick(member.bio, member, locale)
+  const account=await currentAccount(),favorite=account?!!await database().prepare('SELECT 1 FROM account_favorites WHERE account_id=? AND member_slug=?').bind(account.id,member.slug).first():false
 
   return (
     <>
@@ -68,14 +70,7 @@ export default async function MemberPage({ params }: Props) {
             </div>
             <h1 className="font-display text-5xl font-bold tracking-tight md:text-7xl">{member.handle}</h1>
             <div>
-              <Link
-                href={`/login?next=/members/${member.slug}`}
-                className="inline-flex h-11 items-center gap-2 border border-foreground px-5 text-sm font-bold hover:bg-primary"
-              >
-                <Heart className="size-4" aria-hidden="true" />
-                {t.members.oshiAdd}
-              </Link>
-              <p className="mt-2 text-xs text-muted-foreground">{t.members.oshiLoginRequired}</p>
+              {account?<form method="post" action="/api/account/actions"><input type="hidden" name="action" value="favorite"/><input type="hidden" name="member" value={member.slug}/><input type="hidden" name="remove" value={favorite?'1':'0'}/><button className="inline-flex h-11 items-center gap-2 border border-foreground px-5 text-sm font-bold hover:bg-primary"><Heart className="size-4" fill={favorite?'currentColor':'none'}/>{locale==='ja'?(favorite?'推し登録を解除':'推しに登録'):(favorite?'Remove favourite':'Add favourite')}</button></form>:<><Link href={`/login?next=/members/${member.slug}`} className="inline-flex h-11 items-center gap-2 border border-foreground px-5 text-sm font-bold hover:bg-primary"><Heart className="size-4"/>{t.members.oshiAdd}</Link><p className="mt-2 text-xs text-muted-foreground">{t.members.oshiLoginRequired}</p></>}
             </div>
           </header>
 

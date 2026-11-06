@@ -1,0 +1,2 @@
+import {currentAccount,database} from '@/lib/auth/server'
+export async function GET(){if((await currentAccount())?.role!=='admin')return new Response('Forbidden',{status:403});const rows=await database().prepare('SELECT kind,slug,data,published,updated_at FROM content_records ORDER BY kind,slug').all();return Response.json({format:'egk-content-backup-v1',createdAt:new Date().toISOString(),records:rows.results},{headers:{'Cache-Control':'no-store','Content-Disposition':`attachment; filename="egk-content-${new Date().toISOString().slice(0,10)}.json"`}})}

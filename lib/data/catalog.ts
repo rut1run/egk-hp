@@ -24,7 +24,7 @@ export async function getCartCatalog(locale: Locale): Promise<Record<string, Cat
       const optionsLabel = p.options
         .map((o) => {
           const val = o.values.find((x) => x.id === v.options[o.key])
-          return val ? `${label(o.name, locale)}: ${label(val.label, locale)}` : null
+          return val ? `${pick(o.name, p, locale)}: ${pick(val.label, p, locale)}` : null
         })
         .filter(Boolean)
         .join(' / ')

@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import Link from '@/components/site/link'
 import { usePathname } from 'next/navigation'
 import { ShoppingBag, UserRound } from 'lucide-react'
 import { useI18n } from '@/components/providers/i18n-provider'
@@ -16,7 +16,7 @@ export function SiteHeader() {
   const { count, ready } = useCart()
 
   return (
-    <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/85">
+    <header className="site-header fixed inset-x-0 top-0 z-40 border-b bg-background">
       <div className="mx-auto flex h-14 max-w-7xl items-center gap-6 px-4 md:h-16 md:px-8">
         <Logo />
         <nav aria-label={t.nav.mainNav} className="hidden flex-1 lg:block">

@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import Link from '@/components/site/link'
 import { useI18n } from '@/components/providers/i18n-provider'
 import { useCart } from '@/components/providers/cart-provider'
 import { formatPrice } from '@/lib/i18n/format'
@@ -47,7 +47,7 @@ export function CheckoutSummary({ catalog }: { catalog: Record<string, CatalogVa
         </div>
         <div className="flex justify-between text-muted-foreground">
           <dt>{t.cart.shipping}</dt>
-          <dd>{t.cart.shippingTbd}</dd>
+          <dd>{locale==='ja'?'受付後に案内':'Confirmed after your request'}</dd>
         </div>
       </dl>
     </div>

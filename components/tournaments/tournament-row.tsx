@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Link from '@/components/site/link'
 import { ArrowRight } from 'lucide-react'
 import type { Dictionary, Locale } from '@/lib/i18n/dictionaries'
 import { formatDateTime, pick } from '@/lib/i18n/format'

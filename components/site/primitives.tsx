@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Link from '@/components/site/link'
 import { ArrowRight, Info } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EggMark } from './logo'

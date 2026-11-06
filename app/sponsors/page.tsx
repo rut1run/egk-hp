@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
-import Link from 'next/link'
+import Link from '@/components/site/link'
 import { ArrowUpRight } from 'lucide-react'
 import { Container, EmptyState, PageHeader } from '@/components/site/primitives'
 import { getI18n } from '@/lib/i18n/server'

@@ -89,7 +89,9 @@ export type LiveFeedState =
   | { connection: 'connected'; lastUpdatedAt: string; results: TournamentResults }
   | { connection: 'stale'; lastUpdatedAt: string; results: TournamentResults }
 
-export type ProductCategory = 'apparel' | 'goods' | 'gaming'
+export type ProductCategory = string
+export type ShopCategory = { slug: string; name: Localized; order: number }
+export type TeamContent = Translatable & { slug: string; body: Localized; socials: { type: string; url: string; label: string }[] }
 export type Fulfillment = 'stock' | 'made_to_order'
 
 export type ProductOption = {
@@ -138,6 +140,8 @@ export type Sponsor = Translatable & {
 }
 
 export type Banner = {
+  translation?: TranslationStatus
+  mobileImageUrl?: string
   id: string
   imageUrl: string
   alt: Localized

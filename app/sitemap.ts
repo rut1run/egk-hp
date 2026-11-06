@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { getMembers, getNews, getProducts, getTournaments } from '@/lib/data'
 
-const base = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+const base = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://egk-official-team.sia-rut1run.chatgpt.site'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [members, news, tournaments, products] = await Promise.all([

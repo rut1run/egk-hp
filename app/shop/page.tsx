@@ -1,13 +1,13 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import Link from '@/components/site/link'
 import { ProductCard } from '@/components/shop/product-card'
 import { Container, EmptyState, PageHeader } from '@/components/site/primitives'
 import { getI18n } from '@/lib/i18n/server'
-import { getAvailability, getProducts } from '@/lib/data'
-import type { ProductCategory } from '@/lib/types'
+import { getAvailability, getProducts, getCategories } from '@/lib/data'
+import { label } from '@/lib/i18n/format'
 import { cn } from '@/lib/utils'
 
-const CATEGORIES: ProductCategory[] = ['apparel', 'goods', 'gaming']
+
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getI18n()
@@ -16,7 +16,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function ShopPage({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
   const { category: raw } = await searchParams
-  const category = CATEGORIES.includes(raw as ProductCategory) ? (raw as ProductCategory) : undefined
+  const categories=await getCategories()
+  const category = categories.some(c=>c.slug===raw) ? raw : undefined
   const { t, locale } = await getI18n()
   const products = await getProducts({ category })
   const order = { on_sale: 0, coming_soon: 1, sold_out: 2, ended: 3 } as const
@@ -24,7 +25,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
     .map((p) => ({ p, a: getAvailability(p) }))
     .sort((x, y) => order[x.a] - order[y.a])
 
-  const tabs = [{ key: undefined, label: t.common.all }, ...CATEGORIES.map((c) => ({ key: c, label: t.shop.categories[c] }))]
+  const tabs = [{ key: undefined, label: t.common.all }, ...categories.map((c) => ({ key: c.slug, label: label(c.name,locale) }))]
 
   return (
     <>

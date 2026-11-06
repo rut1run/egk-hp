@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import Link from '@/components/site/link'
 import { ArrowRight } from 'lucide-react'
 import { Container, PageHeader, SectionHeading } from '@/components/site/primitives'
 import { Reveal } from '@/components/site/reveal'
 import { getI18n } from '@/lib/i18n/server'
-import { label } from '@/lib/i18n/format'
-import { getDivisions, getMembers } from '@/lib/data'
+import { label, pick } from '@/lib/i18n/format'
+import { getDivisions, getMembers, getTeamIntro } from '@/lib/data'
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getI18n()
@@ -14,7 +14,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function TeamPage() {
   const { t, locale } = await getI18n()
-  const [divisions, members] = await Promise.all([getDivisions(), getMembers()])
+  const [divisions, members, intro] = await Promise.all([getDivisions(), getMembers(), getTeamIntro()])
 
   return (
     <>
@@ -28,8 +28,8 @@ export default async function TeamPage() {
                 EggKingdom
               </span>
             </p>
-            <p className="border-l-4 border-primary pl-5 text-sm leading-8 text-muted-foreground md:text-base">
-              {t.team.aboutPlaceholder}
+            <p className="whitespace-pre-line border-l-4 border-primary pl-5 text-sm leading-8 text-muted-foreground md:text-base">
+              {intro ? pick(intro.body,intro,locale) : t.team.aboutPlaceholder}
             </p>
           </div>
         </Reveal>

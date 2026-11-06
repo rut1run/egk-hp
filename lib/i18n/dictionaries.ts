@@ -7,7 +7,7 @@ const ja = {
     name: 'EGK',
     fullName: 'EggKingdom',
     description: 'ゲーミングチーム EGK（EggKingdom）の公式サイト。メンバー、お知らせ、大会情報、公式グッズ。',
-    devNotice: 'このサイトは開発中です。表示中のメンバー・商品・大会・価格はすべて開発用の仮データです。',
+    devNotice: 'このサイトは開発中です。一部に開発用の仮データを表示しています。商品・価格・大会情報は確認用です。',
     skipToContent: '本文へ移動',
   },
   nav: {
@@ -275,7 +275,7 @@ const en: Dictionary = {
     name: 'EGK',
     fullName: 'EggKingdom',
     description: 'Official website of gaming team EGK (EggKingdom). Members, news, tournaments and official merchandise.',
-    devNotice: 'This site is under development. All members, products, tournaments and prices shown are development data.',
+    devNotice: 'This site is under development and includes sample content. Products, prices and tournaments are for preview purposes.',
     skipToContent: 'Skip to content',
   },
   nav: {

@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Link from '@/components/site/link'
 import type { Dictionary } from '@/lib/i18n/dictionaries'
 import { legalLinks, primaryLinks } from '@/lib/nav'
 import { Logo } from './logo'

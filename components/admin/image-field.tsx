@@ -1,0 +1,6 @@
+'use client'
+import { useState } from 'react'
+export function ImageField({name,label,initial='',required=false,endpoint='/api/admin/upload'}:{name:string;label:string;initial?:string;required?:boolean;endpoint?:string}) {
+ const [value,setValue]=useState(initial),[busy,setBusy]=useState(false),[error,setError]=useState('')
+ return <div className="space-y-2"><label htmlFor={name} className="block text-sm font-bold">{label}</label><input required={required} id={name} name={name} value={value} onChange={e=>setValue(e.target.value)} className="h-12 w-full border px-3 text-sm" placeholder="https://… または画像を選択"/><input aria-label={`${label}をアップロード`} type="file" accept="image/png,image/jpeg,image/webp" disabled={busy} onChange={async e=>{const file=e.target.files?.[0];if(!file)return;setBusy(true);setError('');try{const form=new FormData();form.set('image',file);const r=await fetch(endpoint,{method:'POST',body:form});const data=await r.json() as {error?:string;url?:string};if(!r.ok)throw Error(data.error||'保存できませんでした。');if(!data.url)throw Error('保存先を取得できませんでした。');setValue(data.url)}catch(err){setError(err instanceof Error?err.message:'保存できませんでした。')}finally{setBusy(false)}}}/><p className="text-xs text-muted-foreground">PNG・JPEG・WebP、5MB以下。{busy?'アップロード中です。保存は完了後に行ってください。':''}</p><p role="status" className="text-sm text-destructive">{error}</p></div>
+}

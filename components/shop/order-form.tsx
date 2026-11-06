@@ -1,0 +1,10 @@
+'use client'
+import {useState,useEffect,useRef} from 'react'
+import {useCart} from '@/components/providers/cart-provider'
+import {useI18n} from '@/components/providers/i18n-provider'
+import {Field,SubmitButton} from '@/components/site/field'
+export function OrderForm({email='',address={}}:{email?:string;address?:Record<string,string>}){
+ const {lines,ready}=useCart(),{locale}=useI18n(),ja=locale==='ja', [key,setKey]=useState(''),[pending,setPending]=useState(false),sent=useRef(false)
+ useEffect(()=>setKey(crypto.randomUUID()),[])
+ return <form action="/api/orders" method="post" className="space-y-6" onSubmit={e=>{if(sent.current){e.preventDefault();return}sent.current=true;setPending(true)}}><input name="lines" type="hidden" value={JSON.stringify(lines)}/><input name="idempotency" type="hidden" value={key}/><Field id="email" type="email" label={ja?'メールアドレス':'Email'} defaultValue={email} required maxLength={254}/>{[['name',ja?'氏名':'Name'],['phone',ja?'電話番号':'Phone'],['postal',ja?'郵便番号':'Postal code'],['prefecture',ja?'都道府県':'Prefecture'],['city',ja?'市区町村・番地':'City and street'],['building',ja?'建物名・部屋番号':'Building']].map(([name,label])=><Field key={name} id={name} label={label} defaultValue={address[name]} required={name!=='building'} maxLength={name==='city'||name==='building'?200:100}/>)}<div className="border-l-4 border-primary bg-muted p-4 text-sm leading-7">{ja?'現在は注文内容の受付です。この操作では支払い・購入確定・在庫確保は行われません。送料・支払い方法・在庫を運営が確認後に案内します。':'This submits an order request. It does not charge you, confirm a purchase, or reserve inventory. Staff will confirm shipping, availability and payment instructions.'}</div><label className="flex gap-3 text-sm leading-6"><input type="checkbox" name="agree" required/>{ja?'受付内容と、送料・在庫・支払い方法の確認が必要なことを確認しました。':'I understand that shipping, stock and payment details need confirmation.'}</label><SubmitButton disabled={!ready||!key||!lines.length||pending}>{pending?(ja?'送信中…':'Submitting…'):(ja?'注文内容を送信（支払いは発生しません）':'Submit order request (no charge)')}</SubmitButton></form>
+}

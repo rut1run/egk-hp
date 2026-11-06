@@ -1,40 +1,33 @@
-import type { Metadata } from 'next'
-import Link from 'next/link'
-import { Container, Notice, PageHeader } from '@/components/site/primitives'
-import { getI18n } from '@/lib/i18n/server'
-
-export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await getI18n()
-  return { title: t.mypage.title, robots: { index: false } }
-}
-
-/** Becomes a session-protected page once auth is connected; signed-out users are redirected to /login. */
-export default async function MyPage() {
-  const { t } = await getI18n()
-  const sections = Object.values(t.mypage.sections)
-  return (
-    <>
-      <PageHeader title={t.mypage.title} lead={t.mypage.loginRequired}>
-        <div className="mt-6 flex flex-wrap gap-3">
-          <Link href="/login?next=/mypage" className="inline-flex h-12 items-center bg-primary px-6 text-sm font-black text-primary-foreground">
-            {t.nav.login}
-          </Link>
-          <Link href="/register" className="inline-flex h-12 items-center border border-foreground px-6 text-sm font-bold">
-            {t.auth.registerTitle}
-          </Link>
-        </div>
-      </PageHeader>
-      <Container className="flex max-w-3xl flex-col gap-6 py-10 md:py-14">
-        <Notice tone="warn">{t.auth.notConnected}</Notice>
-        <ul className="divide-y border-y" aria-label={t.mypage.title}>
-          {sections.map((s) => (
-            <li key={s} className="flex items-center justify-between py-4 text-sm font-bold text-muted-foreground">
-              {s}
-              <span className="text-xs font-normal">{t.common.notConnected}</span>
-            </li>
-          ))}
-        </ul>
-      </Container>
-    </>
-  )
+import Link from '@/components/site/link'
+import {redirect} from 'next/navigation'
+import {currentAccount,database} from '@/lib/auth/server'
+import {profile} from '@/lib/account'
+import {mailReady} from '@/lib/services/mail'
+import {Container,PageHeader} from '@/components/site/primitives'
+import {Field,SubmitButton} from '@/components/site/field'
+import {ImageField} from '@/components/admin/image-field'
+import {getI18n} from '@/lib/i18n/server'
+import {getMembers,getNews,getProducts,getAvailability} from '@/lib/data'
+import {MemberTile} from '@/components/members/member-avatar'
+import {NewsList} from '@/components/news/news-list'
+import {ProductCard} from '@/components/shop/product-card'
+import {orderLabels} from '@/lib/orders'
+export const dynamic='force-dynamic'
+export const metadata={title:'マイページ',robots:{index:false}}
+function Action({action,children}:{action:string;children:React.ReactNode}){return <form method="post" action="/api/account/actions" className="space-y-5"><input type="hidden" name="action" value={action}/>{children}</form>}
+export default async function MyPage({searchParams}:{searchParams:Promise<{saved?:string;error?:string;notice?:string}>}){
+ const a=await currentAccount();if(!a)redirect('/login');const {t,locale}=await getI18n(),ja=locale==='ja',p=await searchParams,db=database(),prof=await profile(a.id)
+ const [fav,all,news,products,orders]=await Promise.all([db.prepare('SELECT member_slug FROM account_favorites WHERE account_id=?').bind(a.id).all<{member_slug:string}>(),getMembers(),getNews(),getProducts(),db.prepare('SELECT id,status,total,created_at FROM orders WHERE account_id=? ORDER BY created_at DESC LIMIT 100').bind(a.id).all<{id:string;status:string;total:number;created_at:number}>()])
+ const ids=new Set(fav.results.map(x=>x.member_slug)),members=all.filter(m=>ids.has(m.slug)),relatedNews=news.filter(n=>n.memberSlugs.some(m=>ids.has(m))),relatedProducts=products.filter(n=>n.memberSlugs.some(m=>ids.has(m)))
+ return <><PageHeader title={t.mypage.title}/><Container className="max-w-4xl space-y-12 py-10">{(p.saved||p.notice)&&<p role="status" className="border-l-4 border-primary bg-muted p-4 text-sm">{p.notice==='verification-sent'?(ja?'確認メールを送信しました。':'Verification email sent.'):p.notice==='verified'?(ja?'メールの本人確認が完了しました。':'Email verified.'):(ja?'保存しました。':'Saved.')}</p>}{p.error&&<p role="alert" className="border-l-4 border-destructive p-4 text-sm">{p.error==='mail'?(ja?'メール送信サービスが未設定です。設定後に利用できます。':'Email delivery is not configured.'):(ja?'保存できませんでした。入力と現在のパスワードを確認してください。':'Unable to save. Check your input and current password.')}</p>}
+ <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-5"><div>{prof.data.iconUrl&&<img src={prof.data.iconUrl} alt="" className="mb-3 size-16 rounded-full border object-cover"/>}<p className="text-xl font-black">{a.display_name}</p><p className="mt-1 text-sm text-muted-foreground">@{a.username} · {a.email}</p><p className="mt-2 text-xs">{prof.verified?(ja?'メール確認済み':'Email verified'):(ja?'メール未確認':'Email unverified')}</p></div>{a.role==='admin'&&<Link className="bg-primary px-5 py-3 text-sm font-bold" href="/admin">{ja?'管理画面へ':'Administration'}</Link>}</div>
+ <section className="space-y-5"><h2 className="text-xl font-black">{ja?'推しメンバー':'Favourite members'}</h2>{members.length?<ul className="grid grid-cols-3 gap-5 sm:grid-cols-5">{members.map(m=><li key={m.slug}><MemberTile member={m}/></li>)}</ul>:<p className="text-sm text-muted-foreground">{ja?'メンバーの個人ページから登録できます。':'Add favourites from member pages.'} <Link href="/members" className="underline">{ja?'メンバーを見る':'Browse members'}</Link></p>}{!!relatedNews.length&&<NewsList posts={relatedNews.slice(0,10)} t={t} locale={locale}/>} {!!relatedProducts.length&&<ul className="grid grid-cols-2 gap-5 sm:grid-cols-4">{relatedProducts.map(item=><li key={item.slug}><ProductCard product={item} availability={getAvailability(item)} t={t} locale={locale}/></li>)}</ul>}</section>
+ <section className="space-y-4"><h2 className="text-xl font-black">{ja?'注文履歴':'Orders'}</h2>{orders.results.length?<ul className="divide-y border-y">{orders.results.map(o=><li key={o.id}><Link className="flex flex-wrap justify-between gap-3 py-4 text-sm" href={`/orders/${o.id}`}><span>{o.id}</span><span>{orderLabels[o.status]??o.status} · ¥{o.total.toLocaleString()}</span></Link></li>)}</ul>:<p className="text-sm text-muted-foreground">{ja?'注文はまだありません。':'No orders yet.'}</p>}</section>
+ <section className="max-w-2xl space-y-5 border-t pt-7"><h2 className="text-xl font-black">{ja?'プロフィール':'Profile'}</h2><Action action="profile"><Field id="displayName" label={ja?'表示名':'Display name'} defaultValue={a.display_name} maxLength={80} required/><ImageField name="iconUrl" label={ja?'アイコン画像':'Profile image'} endpoint="/api/account/upload" initial={prof.data.iconUrl}/><SubmitButton>{ja?'プロフィールを保存':'Save profile'}</SubmitButton></Action></section>
+ <section className="max-w-2xl space-y-5 border-t pt-7"><h2 className="text-xl font-black">{ja?'配送先住所':'Shipping address'}</h2><Action action="address">{[['name',ja?'氏名':'Name'],['postal',ja?'郵便番号':'Postal code'],['prefecture',ja?'都道府県':'Prefecture'],['city',ja?'市区町村・番地':'City and street'],['building',ja?'建物名・部屋番号':'Building'],['phone',ja?'電話番号':'Phone']].map(([key,label])=><Field key={key} id={key} label={label} defaultValue={prof.data.address?.[key]} required={key!=='building'} maxLength={key==='city'||key==='building'?200:100}/>)}<SubmitButton>{ja?'住所を保存':'Save address'}</SubmitButton></Action>{prof.data.address&&<Action action="address-delete"><button className="text-sm underline">{ja?'登録した住所を削除':'Remove saved address'}</button></Action>}</section>
+ <section className="max-w-2xl space-y-6 border-t pt-7"><h2 className="text-xl font-black">{ja?'アカウント設定':'Account settings'}</h2>{!prof.verified&&<Action action="verify"><button className="border px-4 py-3 text-sm font-bold" disabled={!mailReady()}>{ja?'確認メールを再送':'Resend verification email'}</button>{!mailReady()&&<p className="text-xs text-muted-foreground">{ja?'メールサービス接続後に本人確認を利用できます。':'Verification becomes available after email delivery is configured.'}</p>}</Action>}
+ <details className="border p-5"><summary className="cursor-pointer font-bold">{ja?'メールアドレスを変更':'Change email'}</summary><div className="mt-5"><Action action="email"><Field id="email" type="email" label={ja?'新しいメールアドレス':'New email'} required/><Field id="emailCurrentPassword" name="currentPassword" type="password" autoComplete="current-password" label={ja?'現在のパスワード':'Current password'} required/><SubmitButton disabled={!mailReady()}>{ja?'新しいアドレスへ確認メールを送信':'Send verification email'}</SubmitButton></Action></div></details>
+ <details className="border p-5"><summary className="cursor-pointer font-bold">{ja?'パスワードを変更':'Change password'}</summary><div className="mt-5"><Action action="password"><Field id="currentPassword" type="password" autoComplete="current-password" label={ja?'現在のパスワード':'Current password'} required/><Field id="password" type="password" autoComplete="new-password" label={ja?'新しいパスワード':'New password'} minLength={12} maxLength={128} required hint="12〜128文字"/><SubmitButton>{ja?'パスワードを更新してログアウト':'Update password and sign out'}</SubmitButton></Action></div></details>
+ {a.role!=='admin'&&<details className="border p-5"><summary className="cursor-pointer font-bold">{ja?'退会する':'Close account'}</summary><div className="mt-5 space-y-4"><p className="text-xs leading-6">{ja?'プロフィール・住所・推し登録を削除してログインを無効にします。注文・問い合わせの業務記録は保持されます。':'Your profile, address and favourites will be removed. Order and support records are retained.'}</p><Action action="delete"><Field id="deleteCurrentPassword" name="currentPassword" label={ja?'現在のパスワード':'Current password'} type="password" required/><label className="flex gap-3 text-sm"><input type="checkbox" name="confirmDelete" required/>{ja?'退会することを確認しました':'I confirm account closure.'}</label><SubmitButton>{ja?'退会を確定':'Close my account'}</SubmitButton></Action></div></details>}
+ <form method="post" action="/api/account/logout"><button className="border px-6 py-3 text-sm">{ja?'ログアウト':'Sign out'}</button></form></section></Container></>
 }

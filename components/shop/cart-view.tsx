@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import Link from 'next/link'
+import Link from '@/components/site/link'
 import { Minus, Plus, X } from 'lucide-react'
 import { useI18n } from '@/components/providers/i18n-provider'
 import { MAX_QTY_PER_LINE, useCart } from '@/components/providers/cart-provider'

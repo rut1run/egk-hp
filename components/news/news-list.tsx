@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import Link from 'next/link'
+import Link from '@/components/site/link'
 import type { Dictionary, Locale } from '@/lib/i18n/dictionaries'
 import { formatDate, pick } from '@/lib/i18n/format'
 import type { NewsPost } from '@/lib/types'

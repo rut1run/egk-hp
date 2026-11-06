@@ -1,0 +1,4 @@
+import {currentAccount,database,sameOrigin} from '@/lib/auth/server'
+import {boundedForm} from '@/lib/auth/form'
+import {digest,randomToken} from '@/lib/auth/crypto'
+export async function POST(request:Request){if(!sameOrigin(request))return new Response('Forbidden',{status:403});const a=await currentAccount();if(a?.role!=='admin')return new Response('Forbidden',{status:403});const f=await boundedForm(request,1000);if(f.get('confirm')!=='on')return new Response('Confirmation required',{status:400});const token=randomToken();await database().batch([database().prepare("INSERT INTO site_settings(key,value) VALUES('tournament_feed_hash',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value").bind(await digest(token)),database().prepare('INSERT INTO admin_audit(id,account_id,action,target,created_at) VALUES(?,?,?,?,?)').bind(crypto.randomUUID(),a.id,'rotate-key','tournament-feed',Date.now())]);return Response.json({token},{headers:{'Cache-Control':'no-store'}})}

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import Link from '@/components/site/link'
 import { NewsList } from '@/components/news/news-list'
 import { Container, EmptyState, PageHeader } from '@/components/site/primitives'
 import { getI18n } from '@/lib/i18n/server'

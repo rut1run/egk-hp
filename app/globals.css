@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import 'shadcn/tailwind.css';
+@import '../vendor/shadcn-tailwind-4.13.0.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -66,7 +66,7 @@
     @apply border-border outline-ring/50;
   }
   html {
-    scroll-padding-top: 5rem;
+    scroll-padding-top: calc(5rem + env(safe-area-inset-top, 0px));
   }
   body {
     @apply bg-background text-foreground font-sans;
@@ -79,6 +79,21 @@
 }
 
 @layer components {
+  /* The header and its spacer share the same safe-area-aware height.
+     Avoid sticky + backdrop-filter compositing glitches in iOS webviews. */
+  .site-header {
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+  .site-header-space {
+    height: calc(3.5rem + env(safe-area-inset-top, 0px));
+  }
+  @media (min-width: 48rem) {
+    .site-header-space {
+      height: calc(4rem + env(safe-area-inset-top, 0px));
+    }
+  }
   .egg {
     border-radius: 50% 50% 50% 50% / 58% 58% 42% 42%;
   }

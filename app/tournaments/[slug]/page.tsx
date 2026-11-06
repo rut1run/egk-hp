@@ -1,8 +1,9 @@
+import {StreamEmbed} from '@/components/tournaments/stream-embed'
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import Link from '@/components/site/link'
 import { notFound } from 'next/navigation'
 import { ArrowLeft, ArrowUpRight } from 'lucide-react'
-import { LivePanel } from '@/components/tournaments/live-panel'
+import { LiveUpdates } from '@/components/tournaments/live-updates'
 import { FortniteStandings, ValorantMatches } from '@/components/tournaments/results'
 import { StatusTag } from '@/components/tournaments/tournament-row'
 import { Container, DevBadge, EmptyState, SectionHeading } from '@/components/site/primitives'
@@ -52,9 +53,9 @@ export default async function TournamentDetailPage({ params }: Props) {
 
       <Container className="grid gap-12 py-10 md:py-14 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:gap-16">
         <div className="flex min-w-0 flex-col gap-12">
-          <JaOnlyNotice record={x} locale={locale} t={t} />
+          <JaOnlyNotice record={x} locale={locale} t={t} />{x.streams.map(stream=><StreamEmbed key={stream.url} stream={stream}/>)}
 
-          {feed && <LivePanel tournament={x} feed={feed} t={t} locale={locale} />}
+          {feed && <LiveUpdates tournament={x} initial={feed} />}
 
           {x.status !== 'live' && (
             <section aria-label={resultsHeading}>
@@ -73,7 +74,7 @@ export default async function TournamentDetailPage({ params }: Props) {
                   {x.results.game === 'fortnite' ? (
                     <FortniteStandings standings={x.results.standings} t={t} />
                   ) : (
-                    <ValorantMatches matches={x.results.matches} t={t} locale={locale} />
+                    <ValorantMatches matches={x.results.matches} t={t} locale={locale} translation={x.translation}/>
                   )}
                 </>
               ) : (
@@ -96,7 +97,7 @@ export default async function TournamentDetailPage({ params }: Props) {
             <ol className="divide-y">
               {x.schedule.map((s) => (
                 <li key={s.at} className="flex items-baseline justify-between gap-4 py-3 text-sm">
-                  <span className="font-bold">{label(s.label, locale)}</span>
+                  <span className="font-bold">{pick(s.label,x,locale)}</span>
                   <time dateTime={s.at} className="font-display tabular-nums text-muted-foreground">
                     {formatDateTime(s.at, locale)}
                   </time>

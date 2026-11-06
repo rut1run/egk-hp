@@ -1,11 +1,11 @@
 'use client'
 
 import Image from 'next/image'
-import Link from 'next/link'
+import Link from '@/components/site/link'
 import { useCallback, useEffect, useState } from 'react'
 import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react'
 import { useI18n } from '@/components/providers/i18n-provider'
-import { label } from '@/lib/i18n/format'
+import { pick } from '@/lib/i18n/format'
 import type { Banner } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
@@ -44,7 +44,7 @@ export function BannerCarousel({ banners }: { banners: Banner[] }) {
             key={b.id}
             href={b.href}
             aria-roledescription="slide"
-            aria-label={`${t.common.slide} ${i + 1} / ${count}: ${label(b.title, locale)}`}
+            aria-label={`${t.common.slide} ${i + 1} / ${count}: ${pick(b.title,{translation:b.translation??'none'},locale)}`}
             aria-hidden={i !== index}
             tabIndex={i === index ? 0 : -1}
             className={cn(
@@ -52,17 +52,13 @@ export function BannerCarousel({ banners }: { banners: Banner[] }) {
               i === index ? 'opacity-100' : 'pointer-events-none opacity-0',
             )}
           >
-            <Image
-              src={b.imageUrl || '/placeholder.svg'}
-              alt={label(b.alt, locale)}
-              fill
-              priority={i === 0}
-              sizes="100vw"
-              className="object-cover"
-            />
+            <picture>
+              {b.mobileImageUrl && <source media="(max-width: 639px)" srcSet={b.mobileImageUrl}/>}
+              <img src={b.imageUrl || '/placeholder.svg'} alt={pick(b.alt,{translation:b.translation??'none'},locale)} fetchPriority={i===0?'high':'auto'} className="absolute inset-0 size-full object-cover"/>
+            </picture>
             <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent pt-16 pb-14 md:pb-16">
               <p className="mx-auto max-w-7xl px-4 text-lg md:px-8 font-black text-white text-balance md:text-3xl">
-                {label(b.title, locale)}
+                {pick(b.title,{translation:b.translation??'none'},locale)}
               </p>
             </div>
           </Link>

@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import Link from 'next/link'
+import Link from '@/components/site/link'
 import { BannerCarousel } from '@/components/home/banner-carousel'
 import { NewsList } from '@/components/news/news-list'
 import { TournamentRows } from '@/components/tournaments/tournament-row'

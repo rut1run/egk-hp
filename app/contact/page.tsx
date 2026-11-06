@@ -8,14 +8,14 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t.contact.title }
 }
 
-export default async function ContactPage() {
-  const { t } = await getI18n()
+export default async function ContactPage({searchParams}:{searchParams:Promise<{sent?:string;error?:string}>}) {
+  const { t,locale } = await getI18n();const p=await searchParams
   return (
     <>
       <PageHeader title={t.contact.title} lead={t.contact.lead} />
       <Container className="max-w-2xl py-10 md:py-14">
-        <form className="flex flex-col gap-6">
-          <fieldset>
+        <form action="/api/contact" method="post" className="flex flex-col gap-6">
+          <input name="website" type="text" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true"/><fieldset>
             <legend className="mb-3 text-sm font-bold">
               {t.contact.type}
               <span aria-hidden="true" className="ml-1 text-destructive">*</span>
@@ -41,8 +41,8 @@ export default async function ContactPage() {
           <Field id="subject" label={t.contact.subject} required />
           <TextareaField id="message" label={t.contact.message} required />
           <p className="text-xs leading-5 text-muted-foreground">{t.contact.note}</p>
-          <Notice tone="warn">{t.contact.notConnected}</Notice>
-          <SubmitButton disabled>{t.contact.submit}</SubmitButton>
+          {p.sent&&<Notice>{locale==='ja'?'お問い合わせを受け付けました。管理者が内容を確認します。':'Your message has been received.'}</Notice>}{p.error&&<Notice tone="warn">{locale==='ja'?'送信できませんでした。入力内容を確認するか、時間をおいて再度お試しください。':'Unable to submit. Check the form or try again later.'}</Notice>}
+          <SubmitButton>{t.contact.submit}</SubmitButton>
         </form>
       </Container>
     </>

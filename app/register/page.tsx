@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import Link from '@/components/site/link'
 import { AuthShell } from '@/components/site/auth-shell'
 import { Field, SubmitButton } from '@/components/site/field'
 import { Notice } from '@/components/site/primitives'
@@ -10,11 +10,11 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t.auth.registerTitle, robots: { index: false } }
 }
 
-export default async function RegisterPage() {
-  const { t } = await getI18n()
+export default async function RegisterPage({searchParams}:{searchParams:Promise<{error?:string}>}) {
+  const { t,locale } = await getI18n();const params=await searchParams
   return (
     <AuthShell title={t.auth.registerTitle}>
-      <form className="flex flex-col gap-5">
+      <form method="post" action="/api/account/register" className="flex flex-col gap-5">
         <Field
           id="userId"
           autoComplete="username"
@@ -29,9 +29,9 @@ export default async function RegisterPage() {
           id="password"
           type="password"
           autoComplete="new-password"
-          minLength={8}
+          minLength={12} maxLength={128}
           label={t.auth.password}
-          hint={t.auth.passwordHint}
+          hint={locale==='ja'?'12〜128文字で設定してください。':'Use 12–128 characters.'}
           required
         />
         <p className="text-xs leading-5 text-muted-foreground">
@@ -39,8 +39,8 @@ export default async function RegisterPage() {
           {' / '}
           <Link href="/privacy" className="underline">{t.legal.privacy}</Link>
         </p>
-        <Notice tone="warn">{t.auth.notConnected}</Notice>
-        <SubmitButton disabled>{t.auth.submitRegister}</SubmitButton>
+        {params.error&&<Notice tone="warn">{locale==='ja'?'入力内容、同意欄、ID・メールの重複を確認してください。':'Check the fields, agreement, and whether the ID or email is already used.'}</Notice>}<label className="flex gap-3 text-sm"><input type="checkbox" name="agree" required/>{locale==='ja'?'利用規約・プライバシーポリシーに同意する':'I agree to the terms and privacy policy.'}</label>
+        <SubmitButton>{t.auth.submitRegister}</SubmitButton>
       </form>
       <p className="border-t pt-6 text-sm">
         {t.auth.hasAccount}{' '}
