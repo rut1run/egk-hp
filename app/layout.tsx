@@ -24,7 +24,7 @@ export async function generateMetadata(): Promise<Metadata> {
       images: ['/images/og.png'],
     },
     twitter: { card: 'summary_large_image' },
-    icons: { icon: '/icon.svg' },
+    icons: { icon: { url: '/images/egk-logo.jpg', type: 'image/jpeg' }, apple: '/images/egk-logo.jpg' },
     robots: isUsingDevData ? { index: false, follow: false } : undefined,
   }
 }

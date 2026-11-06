@@ -9,9 +9,9 @@ export function Logo({ className }: { className?: string }) {
   return (
     <Link
       href="/"
-      className={cn('inline-flex items-center gap-2 font-display text-2xl font-bold tracking-wide', className)}
+      className={cn('inline-flex w-fit shrink-0 items-center gap-2 font-display text-2xl font-bold tracking-wide', className)}
     >
-      <EggMark className="h-6 w-5 ring-1 ring-foreground/80" />
+      <img src="/images/egk-logo.jpg" alt="" width={400} height={400} className="size-10 shrink-0 object-contain" />
       <span>EGK</span>
       <span className="sr-only">EggKingdom</span>
     </Link>
