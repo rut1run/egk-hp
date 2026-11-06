@@ -1,0 +1,33 @@
+name: Deploy EGK to Cloudflare
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: egk-cloudflare-production
+  cancel-in-progress: false
+jobs:
+  deploy:
+    if: github.event_name == 'workflow_dispatch' || vars.CLOUDFLARE_AUTO_DEPLOY == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_D1_DATABASE_ID: ${{ vars.CLOUDFLARE_D1_DATABASE_ID }}
+      CLOUDFLARE_R2_BUCKET: ${{ vars.CLOUDFLARE_R2_BUCKET }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      EGK_SETUP_TOKEN: ${{ secrets.EGK_SETUP_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npx tsc --noEmit
+      - run: node --test tests/auth-validation.test.mjs tests/catalog-validation.test.mjs tests/workflows.test.mjs tests/cloudflare-deploy.test.mjs
+      - run: python tests/sqlite-integrity.test.py
+      - run: npm run cloudflare:deploy

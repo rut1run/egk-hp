@@ -43,6 +43,16 @@ export default defineConfig(async ({ command }) => {
   // Wrangler snapshots its log path while the Cloudflare plugin is imported.
   const { cloudflare } = await import("@cloudflare/vite-plugin");
 
+  if (process.env.EGK_DEPLOY_TARGET === "cloudflare") {
+    return {
+      plugins: [vinext(), cloudflare({
+        configPath: "./.cloudflare.generated.json",
+        viteEnvironment: { name: "rsc", childEnvironments: ["ssr"] },
+        inspectorPort: false,
+      })],
+    };
+  }
+
   return {
     server: {
       ...(managedLinux

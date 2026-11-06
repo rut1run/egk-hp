@@ -43,3 +43,6 @@ yarn-error.log*
 
 # OS metadata
 .DS_Store
+
+# Generated account-specific deployment config (no credentials)
+/.cloudflare.generated.json

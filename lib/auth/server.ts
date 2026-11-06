@@ -44,3 +44,6 @@ export async function bootstrapComplete() {
   return !!await database().prepare("SELECT key FROM site_settings WHERE key='admin_bootstrap'").first()
 }
 export function setupEmail() { return String((env as unknown as Record<string, unknown>).EGK_BOOTSTRAP_EMAIL ?? '').trim().toLowerCase() }
+
+export function standaloneHosting() { return (env as unknown as Record<string, unknown>).EGK_HOSTING_MODE === 'cloudflare' }
+export function setupToken() { return String((env as unknown as Record<string, unknown>).EGK_SETUP_TOKEN ?? '') }
