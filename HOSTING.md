@@ -1,5 +1,11 @@
 # EGK 公開構成
 
+## 選択した構成：自分のサーバー＋独自ドメイン
+
+2026-11-07、サイト・会員・管理画面・DB・画像を1台の自分のサーバーで運営する方針へ変更しました。Next.js / Node.js 24 / SQLite / ローカル画像保存、Docker Compose・nginx・バックアップ手順を用意しています。Cloudflareアカウントは不要です。詳細は [自分のサーバーへの設置手順](deploy/selfhost/README.md)。実サーバーの指定・アクセス・DNS・HTTPSはまだ未設定です。
+
+CloudflareのActionsは手動実行のみとし、pushによる自動公開を停止しました。既存Sites確認版は変更していません。以下のCloudflare手順は代替構成の記録です。
+
 現在の確認版はChatGPT Sitesで稼働しています。
 
 https://egk-official-team.sia-rut1run.chatgpt.site/
@@ -41,7 +47,7 @@ APIトークンには対象アカウントの Workers Scripts Edit、D1 Edit、W
 6. 成功したログに表示されたURLを開き、`/admin/setup` で初回設定キー・本人が決めたID・メール・パスワードを登録する。設定は一度限りで、以降は `/login?next=/admin` を使う。
 7. 公開先で表示・会員登録・ログイン・管理編集・画像アップロード・問い合わせ・注文内容受付を確認する。実決済・実メール送信を確認したことにはならない。
 
-初回確認後、GitHubリポジトリの Variables に `CLOUDFLARE_AUTO_DEPLOY=true` を追加するとmainへのpushで自動反映する。未設定では手動実行のみ。APIキー・設定キーをActionsログへ出力しない。
+CloudflareのActionsは代替構成の手動実行専用です。現在は自分のサーバーで運営するため、mainへのpushではCloudflareへ反映しません。APIキー・設定キーをActionsログへ出力しない。
 
 ### ローカルから公開する場合
 

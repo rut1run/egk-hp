@@ -1,5 +1,5 @@
 import 'server-only'
-import { env } from 'cloudflare:workers'
+import { env } from '#egk-runtime'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { digest, randomToken } from './crypto'
@@ -21,11 +21,21 @@ export async function requireAdmin() {
   if (account.role !== 'admin') redirect('/mypage')
   return account
 }
+export function requestOrigin(request: Request) {
+  if ((env as unknown as Record<string, unknown>).EGK_HOSTING_MODE === 'selfhost') {
+    const configured = String((env as unknown as Record<string, unknown>).EGK_SITE_URL ?? '')
+    if (!configured) throw new Error('EGK_SITE_URL is required for self-hosting')
+    const url = new URL(configured)
+    if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password || url.pathname !== '/' || url.search || url.hash) throw new Error('Invalid EGK_SITE_URL')
+    return url.origin
+  }
+  return new URL(request.url).origin
+}
 export function sameOrigin(request: Request) {
-  return request.headers.get('origin') === new URL(request.url).origin
+  return request.headers.get('origin') === requestOrigin(request)
 }
 export function destination(request: Request, path: string) {
-  const response = new Response(null, { status: 303, headers: { Location: new URL(path, request.url).href, 'Cache-Control': 'no-store' } })
+  const response = new Response(null, { status: 303, headers: { Location: new URL(path, requestOrigin(request)).href, 'Cache-Control': 'no-store' } })
   return response
 }
 export async function createSession(accountId: string, request: Request, path: string) {
@@ -36,7 +46,7 @@ export async function createSession(accountId: string, request: Request, path: s
     db.prepare('INSERT INTO account_sessions(token_hash,account_id,expires_at) VALUES(?,?,?)').bind(await digest(token), accountId, Date.now() + 7 * 86400000),
   ])
   const response = destination(request, path)
-  const secure = new URL(request.url).protocol === 'https:' ? '; Secure' : ''
+  const secure = new URL(requestOrigin(request)).protocol === 'https:' ? '; Secure' : ''
   response.headers.append('Set-Cookie', `${SESSION_COOKIE}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=604800${secure}`)
   return response
 }
@@ -45,5 +55,8 @@ export async function bootstrapComplete() {
 }
 export function setupEmail() { return String((env as unknown as Record<string, unknown>).EGK_BOOTSTRAP_EMAIL ?? '').trim().toLowerCase() }
 
-export function standaloneHosting() { return (env as unknown as Record<string, unknown>).EGK_HOSTING_MODE === 'cloudflare' }
+export function standaloneHosting() {
+  const mode = (env as unknown as Record<string, unknown>).EGK_HOSTING_MODE
+  return mode === 'cloudflare' || mode === 'selfhost'
+}
 export function setupToken() { return String((env as unknown as Record<string, unknown>).EGK_SETUP_TOKEN ?? '') }

@@ -46,3 +46,8 @@ yarn-error.log*
 
 # Generated account-specific deployment config (no credentials)
 /.cloudflare.generated.json
+
+# Self-hosted private data and database backups
+/.data/
+/backups/
+/deploy/selfhost/server.env

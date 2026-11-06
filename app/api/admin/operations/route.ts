@@ -1,4 +1,4 @@
-import {env} from 'cloudflare:workers'
+import {env} from '#egk-runtime'
 import {boundedForm} from '@/lib/auth/form'
 import {currentAccount,database,sameOrigin,destination} from '@/lib/auth/server'
 import {text} from '@/lib/admin/validation'

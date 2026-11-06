@@ -1,5 +1,14 @@
 # EGK実装状況
 
+## 2026-11-07 自分のサーバー用構成
+
+- Next.js standalone、Node.js 24のSQLite、ローカル画像保存へ対応。Cloudflare/Sites向けビルドも保持し、実行先ごとに保存先を分離。
+- Docker Compose、nginxのヘッダー制御、初回設定キー、永続ボリューム、SQLマイグレーション、整合したDBバックアップを追加。
+- サーバーの公開URLを基準にOrigin・リダイレクト・Secure Cookie・メールURLを判定し、リバースプロキシの内部URLに依存させない。
+- 型チェック、Nodeテスト19件、SQLiteテスト8件、本番サーバー起動テスト1件、自分のサーバー用Next.jsビルド、既存Cloudflare向けビルドが成功。Docker EngineがないためDockerイメージ自体は未実行。
+- 起動テストは一時DBで初回設定の偽装拒否・一度限りの管理者登録・ログイン・一般会員登録・管理APIの権限・公開URL・DBバックアップを確認。実サーバーへの設置・独自ドメイン・HTTPS・実機は未検証。
+- 実決済・メール等の外部接続待ちは継続。
+
 ## 2026-11-07 公開先の準備
 
 - GitHub管理＋Cloudflare Workers / D1 / R2向けビルド、手動実行のデプロイActionsを追加。Cloudflareアカウント未接続のため新規公開URLはまだ未発行。

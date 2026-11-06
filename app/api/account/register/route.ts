@@ -1,3 +1,4 @@
+import {requestOrigin} from '@/lib/auth/server'
 import {boundedForm} from '@/lib/auth/form'
 import {database,sameOrigin,destination,createSession} from '@/lib/auth/server'
 import {hashPassword} from '@/lib/auth/crypto'
@@ -11,7 +12,7 @@ export async function POST(request:Request){
   if(!/^[a-z0-9_]{3,20}$/.test(username)||form.get('agree')!=='on')throw Error('input')
   const id=crypto.randomUUID(),db=database()
   await db.batch([db.prepare('INSERT INTO accounts(id,username,display_name,email,password_hash,role,created_at) VALUES(?,?,?,?,?,?,?)').bind(id,username,name,email,await hashPassword(pw),'member',Date.now()),db.prepare('INSERT INTO account_profiles(account_id,data,email_verified) VALUES(?,?,0)').bind(id,'{}')])
-  let notice='registered';try{await sendAccountLink(id,email,'verify',new URL(request.url).origin);notice='verification-sent'}catch{}
+  let notice='registered';try{await sendAccountLink(id,email,'verify',requestOrigin(request));notice='verification-sent'}catch{}
   return createSession(id,request,`/mypage?notice=${notice}`)
  }catch{return destination(request,'/register?error=invalid')}
 }

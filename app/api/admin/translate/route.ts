@@ -1,4 +1,4 @@
-import {env} from 'cloudflare:workers'
+import {env} from '#egk-runtime'
 import {currentAccount,sameOrigin} from '@/lib/auth/server'
 import {boundedJson} from '@/lib/auth/json'
 import {limit} from '@/lib/account'

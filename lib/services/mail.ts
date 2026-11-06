@@ -1,5 +1,5 @@
 import 'server-only'
-import {env} from 'cloudflare:workers'
+import {env} from '#egk-runtime'
 const config=env as unknown as Record<string,string|undefined>
 export function mailReady(){return !!config.RESEND_API_KEY&&!!config.MAIL_FROM}
 export async function sendMail(to:string,subject:string,body:string,key:string){

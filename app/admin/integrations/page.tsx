@@ -1,5 +1,5 @@
 import {FeedKey} from '@/components/admin/feed-key'
-import {env} from 'cloudflare:workers'
+import {env} from '#egk-runtime'
 import {requireAdmin} from '@/lib/auth/server'
 import {mailReady} from '@/lib/services/mail'
 export default async function Integrations(){await requireAdmin();const config=env as unknown as Record<string,string|undefined>;return <><h1 className="mb-7 text-2xl font-black">外部連携・稼働状況</h1><dl className="divide-y border-y text-sm">{[['会員・プロフィール・推し','DBへ保存'],['問い合わせ受付・対応管理','利用可能'],['注文受付・状態管理','支払いを伴わない受付として利用可能'],['メール送信',mailReady()?'設定済み（実送信テストが必要）':'未接続：RESEND_API_KEY / MAIL_FROM が必要'],['オンライン決済','未接続：決済サービスの契約と接続設定が必要'],['製造・発送','手動管理。委託先の指定と接続が必要'],['自動翻訳',config.DEEPL_API_KEY?'設定済み（翻訳ボタンから下書きを作成）':'未接続：DEEPL_API_KEY が必要'],['大会ソフト','大会管理から情報を編集可能。自動更新には外部ソフトからの送信が必要']].map(([label,value])=><div key={label} className="grid gap-2 py-5 sm:grid-cols-[180px_1fr]"><dt className="font-bold">{label}</dt><dd>{value}</dd></div>)}</dl><FeedKey/><p className="mt-7 max-w-3xl text-sm leading-7">メールや決済の未設定を、送信済み・入金済みと表示しません。接続用の秘密鍵をこのページやGitに保存しないでください。ホストの秘密設定で接続します。一般公開前に販売条件・送料・返品・連絡先を正式な内容へ更新してください。</p><a href="/api/admin/backup" className="mt-8 inline-block border px-5 py-3 text-sm font-bold">コンテンツのバックアップを取得</a><p className="mt-3 text-xs text-muted-foreground">保存したコンテンツのみ。パスワード、セッション、購入者・問い合わせの個人情報は含めません。</p></>}

@@ -1,0 +1,13 @@
+node_modules
+.next
+dist
+.git
+.wrangler
+.sites-runtime
+.data
+backups
+.env*
+.dev.vars*
+deploy/selfhost/server.env
+.cloudflare.generated.json
+*.tar.gz

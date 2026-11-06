@@ -1,3 +1,4 @@
+import {requestOrigin} from '@/lib/auth/server'
 import {boundedForm} from '@/lib/auth/form'
 import {currentAccount,database,sameOrigin,destination} from '@/lib/auth/server'
 import {digest,hashPassword,verifyPassword} from '@/lib/auth/crypto'
@@ -14,7 +15,7 @@ export async function POST(request:Request){
   if(action==='reset-request'){
    if(!mailReady())return destination(request,'/password-reset?error=mail')
    await limit(request,'reset',5);const email=emailAddress(text(form,'email',254,true)),row=await db.prepare('SELECT id FROM accounts WHERE email=?').bind(email).first<{id:string}>()
-   if(row)await sendAccountLink(row.id,email,'reset',new URL(request.url).origin).catch(()=>{})
+   if(row)await sendAccountLink(row.id,email,'reset',requestOrigin(request)).catch(()=>{})
    return destination(request,'/password-reset?sent=1')
   }
   if(action==='confirm'){
@@ -52,7 +53,7 @@ export async function POST(request:Request){
     const stored=await db.prepare('SELECT password_hash FROM accounts WHERE id=?').bind(account.id).first<{password_hash:string}>();if(!stored||!await verifyPassword(String(form.get('currentPassword')??''),stored.password_hash))throw Error('password')
    }
    const email=action==='email'?emailAddress(text(form,'email',254,true)):account.email
-   await limit(request,`mail:${account.id}`,3);await sendAccountLink(account.id,email,'verify',new URL(request.url).origin)
+   await limit(request,`mail:${account.id}`,3);await sendAccountLink(account.id,email,'verify',requestOrigin(request))
    return destination(request,'/mypage?notice=verification-sent')
   }else if(action==='password'||action==='delete'){
    const stored=await db.prepare('SELECT password_hash FROM accounts WHERE id=?').bind(account.id).first<{password_hash:string}>();if(!stored||!await verifyPassword(String(form.get('currentPassword')??''),stored.password_hash))throw Error('password')

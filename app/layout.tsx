@@ -9,7 +9,7 @@ import { isUsingDevData } from '@/lib/data'
 import './fonts.css'
 import './globals.css'
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://egk-official-team.sia-rut1run.chatgpt.site'
+const siteUrl = process.env.EGK_SITE_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? 'https://egk-official-team.sia-rut1run.chatgpt.site'
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t, locale } = await getI18n()

@@ -1,5 +1,7 @@
 # EGK（EggKingdom）公式サイト
 
+**現在の公開方針：自分のサーバー＋独自ドメイン。** Next.js / Node.js 24 / SQLite / ローカル画像保存に対応しました。設置手順は [deploy/selfhost/README.md](deploy/selfhost/README.md)。サーバーへの実設置は未実施です。以下には既存のSites確認版の説明も含みます。
+
 現在のChatGPT Sites確認版のソースです。元のv0 / Next.jsの画面を、Vinext・React・Cloudflare Workers + D1 / R2で動かしています。GitHubへの今回の反映元はSitesコミット `da86d4a0b4fab321e7129c4fccba17a9511460b6` です。
 
 確認用サイト： https://egk-official-team.sia-rut1run.chatgpt.site/

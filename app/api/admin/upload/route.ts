@@ -1,5 +1,5 @@
 import { boundedForm } from '@/lib/auth/form'
-import { env } from 'cloudflare:workers'
+import { env } from '#egk-runtime'
 import { currentAccount, sameOrigin } from '@/lib/auth/server'
 export async function POST(request: Request) {
   if (!sameOrigin(request) || (await currentAccount())?.role !== 'admin') return new Response('Forbidden',{status:403})

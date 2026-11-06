@@ -14,7 +14,10 @@
     "db:generate": "drizzle-kit generate",
     "cloudflare:configure": "node scripts/cloudflare-config.mjs",
     "cloudflare:build": "node scripts/cloudflare-build.mjs",
-    "cloudflare:deploy": "node scripts/cloudflare-deploy.mjs"
+    "cloudflare:deploy": "node scripts/cloudflare-deploy.mjs",
+    "selfhost:build": "next build --webpack",
+    "selfhost:start": "node scripts/selfhost-start.mjs",
+    "selfhost:migrate": "node scripts/selfhost-migrate.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
@@ -69,5 +72,8 @@
     "miniflare": {
       "sharp": "0.35.4"
     }
+  },
+  "imports": {
+    "#egk-runtime": "./lib/runtime/cloudflare.ts"
   }
 }

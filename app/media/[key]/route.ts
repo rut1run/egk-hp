@@ -1,4 +1,4 @@
-import { env } from 'cloudflare:workers'
+import { env } from '#egk-runtime'
 export async function GET(_request: Request, {params}: {params:Promise<{key:string}>}) {
   const {key}=await params
   if(!/^[a-z0-9-]+\.(png|jpg|webp)$/.test(key)||!env.BUCKET)return new Response('Not found',{status:404})

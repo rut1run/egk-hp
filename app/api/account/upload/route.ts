@@ -1,6 +1,6 @@
 import { limit } from '@/lib/account'
 import { boundedForm } from '@/lib/auth/form'
-import { env } from 'cloudflare:workers'
+import { env } from '#egk-runtime'
 import { currentAccount, sameOrigin } from '@/lib/auth/server'
 export async function POST(request: Request) {
   const account=await currentAccount()

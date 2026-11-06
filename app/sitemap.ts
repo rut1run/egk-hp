@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { getMembers, getNews, getProducts, getTournaments } from '@/lib/data'
 
-const base = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://egk-official-team.sia-rut1run.chatgpt.site'
+const base = process.env.EGK_SITE_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? 'https://egk-official-team.sia-rut1run.chatgpt.site'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [members, news, tournaments, products] = await Promise.all([
@@ -19,3 +19,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...products.map((p) => ({ url: `${base}/shop/${p.slug}` })),
   ]
 }
+
+// Content lives in the runtime DB; never read production data while building.
+export const dynamic = 'force-dynamic'
